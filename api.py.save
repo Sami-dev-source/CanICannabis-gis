@@ -1,0 +1,26 @@
+from fastapi import FastAPI
+import psycopg2
+import json
+
+app = FastAPI()
+
+# الاتصال بقاعدة البيانات
+conn = psycopg2.connect(
+    dbname="canicannabis",
+    user="postgres",
+    host="localhost"
+)
+cur = conn.cursor()
+
+# =========================
+# 🔴 المناطق الحمراء (دائمًا)
+# =========================
+@app.get("/zones/red")
+def red_zones():
+    cur.execute("SELECT ST_AsGeoJSON(geom), zone_color, restriction FROM red_zones;")
+    rows = cur.fetchall()
+    return {
+        "type": "FeatureCollection",
+        "features": [
+            {
+       
